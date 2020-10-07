@@ -47,6 +47,11 @@ class Generator(nn.Module):
         x = self.model(x)
         return x
 
+class Discriminator(nn.Module):
+
+    def __init__(self):
+        super(Discriminator, self).__init__()
+
 if __name__ == "__main__":
     # Generator G
     Z_DIM = 100
