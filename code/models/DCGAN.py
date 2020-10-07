@@ -49,7 +49,15 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
 
-    def __init__(self, channels, kernel_sizes, strides, paddings, batch_norm, activations):
+    def __init__(self, channels, kernel_sizes, strides, paddings, batch_norm, activation):
+        """
+        channels: array containing channels for each conv layer, starting from the input image dimension until the output dimension
+        kernel_sizes: array containing kernel sizes for each conv layer
+        strides: array containing strides for each conv layer
+        paddings: array containing paddings for each conv layer
+        batch_norm: True if batch norm is to be used, otherwise, False
+        activation: a single activation function for the hidden layers
+        """
         super(Discriminator, self).__init__()
 
 
