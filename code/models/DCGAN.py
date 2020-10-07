@@ -18,7 +18,7 @@ class Generator(nn.Module):
     
     def _build(self, channels, kernel_sizes, strides, paddings, batch_norm, activations):
         layers = []
-        for i in range(1, channels):
+        for i in range(1, len(channels)):
             # add convtranspose layer
             layers += [nn.ConvTranspose2d(
                 in_channels=channels[i-1],
@@ -46,3 +46,16 @@ class Generator(nn.Module):
     def forward(self, x):
         x = self.model(x)
         return x
+
+if __name__ == "__main__":
+    # Generator G
+    Z_DIM = 100
+    G = Generator(
+        channels=[Z_DIM, 256, 128, 64, 1],
+        kernel_sizes=[None, 7, 5, 4, 4],
+        strides=[None, 1, 1, 2, 2],
+        paddings=[None, 0, 2, 1, 1],
+        batch_norm=True,
+        activations=[nn.ReLU(), nn.Tanh()]
+    )
+    print(G)
