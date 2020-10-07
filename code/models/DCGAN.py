@@ -13,3 +13,15 @@ class Generator(nn.Module):
         activations: array containing a hidden activation and an output activation
         """
         super(Generator, self).__init__()
+        self.model = self._build(channels, kernel_sizes, strides, paddings, batch_norm, activations)
+        self._init_weights()
+    
+    def _build(self, channels, kernel_sizes, strides, paddings, batch_norm, activations):
+        pass
+
+    def _init_weights(self):
+        pass
+
+    def forward(self, x):
+        x = self.model(x)
+        return x
