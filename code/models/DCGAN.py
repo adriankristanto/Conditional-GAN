@@ -49,8 +49,9 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
 
-    def __init__(self):
+    def __init__(self, channels, kernel_sizes, strides, paddings, batch_norm, activations):
         super(Discriminator, self).__init__()
+
 
 if __name__ == "__main__":
     # Generator G
