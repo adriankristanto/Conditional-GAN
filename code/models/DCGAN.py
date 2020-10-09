@@ -66,7 +66,12 @@ class Discriminator(nn.Module):
         pass
 
     def _init_weights(self):
-        pass
+        for module in self.modules():
+            if isinstance(module, nn.Conv2d):
+                nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            elif isinstance(module, nn.BatchNorm2d):
+                nn.init.normal_(module.weight, mean=0.0, std=0.02)
+                nn.init.constant_(module.bias, 0)
 
     def forward(self, x):
         x = self.model(x)
