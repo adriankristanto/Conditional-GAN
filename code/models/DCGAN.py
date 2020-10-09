@@ -63,7 +63,23 @@ class Discriminator(nn.Module):
         self._init_weights()
 
     def _build(self, channels, kernel_sizes, strides, paddings, batch_norm, activation):
-        pass
+        layers = []
+        for i in range(1, len(channels)):
+            # add convtranspose layer
+            layers += [nn.Conv2d(
+                in_channels=channels[i-1],
+                out_channels=channels[i],
+                kernel_size=kernel_sizes[i],
+                stride=strides[i],
+                padding=paddings[i],
+                bias=False if batch_norm else True
+            )]
+            # add batchnorm
+            if batch_norm and i < len(channels)-1:
+                layers += [nn.BatchNorm2d(channels[i])]
+            # add activation
+            layers += [activation]
+        return nn.Sequential(*layers)
 
     def _init_weights(self):
         for module in self.modules():
