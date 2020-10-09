@@ -77,8 +77,9 @@ class Discriminator(nn.Module):
             # add batchnorm
             if batch_norm and i < len(channels)-1:
                 layers += [nn.BatchNorm2d(channels[i])]
-            # add activation
-            layers += [activation]
+            # add hidden activation
+            if i < len(channels)-1:
+                layers += [activation]
         return nn.Sequential(*layers)
 
     def _init_weights(self):
