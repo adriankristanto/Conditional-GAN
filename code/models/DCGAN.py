@@ -106,3 +106,14 @@ if __name__ == "__main__":
         activations=[nn.ReLU(), nn.Tanh()]
     )
     print(G)
+
+    # Discriminator D
+    D = Discriminator(
+        channels=[1, 64, 128, 256, 1],
+        kernel_sizes=[None, 4, 4, 5, 7],
+        strides=[None, 2, 2, 1, 1],
+        paddings=[None, 1, 1, 2, 0],
+        batch_norm=False,
+        activation=nn.LeakyReLU(0.2),
+    )
+    print(D)
