@@ -59,6 +59,17 @@ class Discriminator(nn.Module):
         activation: a single activation function for the hidden layers
         """
         super(Discriminator, self).__init__()
+        self.model = self._build(channels, kernel_sizes, strides, paddings, batch_norm, activation)
+        self._init_weights()
+
+    def _build(self, channels, kernel_sizes, strides, paddings, batch_norm, activation):
+        pass
+
+    def _init_weights(self):
+        pass
+
+    def forward(self, x):
+        pass
 
 
 if __name__ == "__main__":
