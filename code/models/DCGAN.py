@@ -69,7 +69,8 @@ class Discriminator(nn.Module):
         pass
 
     def forward(self, x):
-        pass
+        x = self.model(x)
+        return x
 
 
 if __name__ == "__main__":
