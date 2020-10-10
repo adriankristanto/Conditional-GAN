@@ -10,6 +10,7 @@ import os
 
 # Hyperparameters
 BATCH_SIZE = 128
+Z_DIM = 100
 
 if __name__ == "__main__":
     
@@ -43,4 +44,53 @@ if __name__ == "__main__":
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
 
-    print(f"Total training data: {len(trainset)}\n", flush=True)
+    # total unique classes in MNIST dataset
+    num_classes = len(trainset.classes)
+    # shape of a single MNIST image
+    MNIST_IMG_SHAPE = (1, 28, 28)
+
+    print(f"""
+Total training data: {len(trainset)}
+Total unique classes: {num_classes}
+    """, flush=True)
+
+    # input image sample
+    # data_iter = iter(trainset)
+    # img, label = next(data_iter)
+    # torchvision.utils.save_image(img, 'sample.png')
+
+    # 2. instantiate the model
+    # Generator G
+    INPUT_DIM = Z_DIM + num_classes 
+    # we will append a one-hot vector to the z_dim
+    # where the one-hot vector is of num_classes dimension
+    G = DCGAN.Generator(
+        channels=[INPUT_DIM, 256, 128, 64, 1],
+        kernel_sizes=[None, 7, 5, 4, 4],
+        strides=[None, 1, 1, 2, 2],
+        paddings=[None, 0, 2, 1, 1],
+        batch_norm=True,
+        activations=[nn.ReLU(), nn.Tanh()]
+    )
+
+    # Discriminator D
+    INPUT_CHANNEL = MNIST_IMG_SHAPE[0] + num_classes
+    # we will append (batch_size, num_classes, 28, 28), which is similar to the one-hot vector
+    # to (batch_size, 1, 28, 28) which is the input batch of MNIST
+    # for example, if dimension 3 of the one-hot vector has the value 1, then we create a tensor of size (1, 28, 28) full on 1s for index 3
+    # and the other 9 tensor will be filled with 0s
+    D = DCGAN.Discriminator(
+        channels=[INPUT_CHANNEL, 64, 128, 256, 1],
+        kernel_sizes=[None, 4, 4, 5, 7],
+        strides=[None, 2, 2, 1, 1],
+        paddings=[None, 1, 1, 2, 0],
+        batch_norm=False,
+        activation=nn.LeakyReLU(0.2),
+    )
+
+    print(f"""
+Generator G:
+{G}
+Critic D:
+{D}
+""", flush=True)
