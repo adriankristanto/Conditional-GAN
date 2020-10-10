@@ -96,7 +96,7 @@ Critic D:
 """, flush=True)
 
     # setting for training using multiple GPUs
-    multigpu =  False
+    multigpu = False
     if torch.cuda.device_count() > 1:
         print(f'Number of GPUs: {torch.cuda.device_count()}\n', flush=True)
         G = nn.DataParallel(G)
@@ -109,4 +109,31 @@ Critic D:
 
     # 3. define the loss function
     def GradientPenaltyLoss(D, real_samples, fake_samples, reduction='mean'):
-        pass
+        batch_size = len(real_samples)
+        epsilon = torch.rand((batch_size, 1, 1, 1)).to(device)
+
+        inputs = epsilon * real_samples + (1 - epsilon) * fake_samples
+        inputs.requires_grad_(True)
+        inputs = inputs.to(device)
+
+        outputs = D(inputs)
+
+        gradients = torch.autograd.grad(
+            inputs=inputs,
+            outputs=outputs,
+            grad_outputs=torch.ones_like(outputs).to(device),
+            create_graph=True,
+            retain_graph=True
+        )[0]
+
+        gradients = gradients.view(batch_size, -1)
+        
+        gradient_penalty = (gradients.norm(2, dim=1) - 1) ** 2
+
+        reduction_func = None
+        if reduction == 'mean':
+            reduction_func = torch.mean
+        elif reduction == 'sum':
+            reduction_func = torch.sum
+    
+        return reduction_func(gradient_penalty)
