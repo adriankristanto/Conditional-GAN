@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as F
 import torchvision
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
@@ -180,3 +181,28 @@ Critic D:
             'g_optim_state_dict' : g_optimizer.state_dict(),
             'd_optim_state_dict' : d_optimizer.state_dict()
         }, target_dir)
+
+    for epoch in range(next_epoch, EPOCH):
+
+        trainloader = tqdm(trainloader)
+
+        for i, train_data in enumerate(trainloader):
+            D.train()
+            G.train()
+
+            reals, labels = train_data[0].to(device), train_data[1].to(device)
+            # convert the labels to one-hot vectors to be concatenated to the noise vector
+            one_hot_labels = F.one_hot(labels, num_classes=num_classes)
+            # expand the one-hot vectors to one-hot images of size (1, 28, 28)
+            # first, expand the one-hot vectors to shape (batch_size, 10, 1, 1) using [:, :, None, None]
+            # next, repeat (1, 1, 28, 28)
+            one_hot_images = one_hot_labels[:, :, None, None].repeat((1, *MNIST_IMG_SHAPE))
+
+            ### train critic
+            for _ in range(CRITIC_ITER):
+                # 1. zeros the gradients
+                d_optim.zero_grad()
+
+            ### train generator
+            break 
+        break
