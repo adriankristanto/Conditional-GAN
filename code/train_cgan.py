@@ -102,3 +102,7 @@ Critic D:
         G = nn.DataParallel(G)
         D = nn.DataParallel(D)
         multigpu = True
+    
+    # move the models to the device that we use for training
+    G.to(device)
+    D.to(device)
