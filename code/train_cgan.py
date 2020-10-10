@@ -8,12 +8,26 @@ from tqdm import tqdm
 import models.DCGAN as DCGAN
 import os
 
+MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
+CONTINUE_TRAIN = False
+CONTINUE_TRAIN_NAME = 'cgan-model-epoch10.pth'
+EPOCH = 400
+SAVE_INTERVAL = 20
+# for generation
+SAMPLE_SIZE = 64
+
 # Hyperparameters
 BATCH_SIZE = 128
 Z_DIM = 100
 GENERATOR_LR = 0.0002
 DISCRIMINATOR_LR = 0.0002
 BETAS = (0.5, 0.999)
+
+# WGAN-GP global variables
+# the recommended ratio used is 5 critic updates to 1 generator update
+CRITIC_ITER = 5
+# the following is the penalty coefficient
+LAMBDA = 10
 
 if __name__ == "__main__":
     
@@ -22,7 +36,6 @@ if __name__ == "__main__":
     print(f"Current device: {device}\n", flush=True)
 
     # directory setup
-    MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
     if 'data' not in os.listdir(MAIN_DIR):
         print('creating data directory...', flush=True)
         os.mkdir(MAIN_DIR + 'data')
@@ -144,3 +157,17 @@ Critic D:
     # 4. define the optimisers
     g_optim = optim.Adam(G.parameters(), lr=GENERATOR_LR, betas=BETAS)
     d_optim = optim.Adam(D.parameters(), lr=DISCRIMINATOR_LR, betas=BETAS)
+
+    # 5. train the model
+    MODEL_DIRPATH = MAIN_DIR + 'saved_models'
+    GENERATED_DIRPATH = MAIN_DIR + 'generated_images'
+    SAVED_MODEL_NAME = MODEL_DIRPATH + CONTINUE_TRAIN_NAME
+
+    next_epoch = 0
+    if CONTINUE_TRAIN:
+        checkpoint = torch.load(SAVED_MODEL_NAME)
+        G.load_state_dict(checkpoint.get('G_state_dict'))
+        D.load_state_dict(checkpoint.get('D_state_dict'))
+        g_optim.load_state_dict(checkpoint.get('g_optim_state_dict'))
+        d_optim.load_state_dict(checkpoint.get('d_optim_state_dict'))
+        next_epoch = checkpoint.get('epoch')
