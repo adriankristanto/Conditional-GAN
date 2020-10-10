@@ -171,3 +171,12 @@ Critic D:
         g_optim.load_state_dict(checkpoint.get('g_optim_state_dict'))
         d_optim.load_state_dict(checkpoint.get('d_optim_state_dict'))
         next_epoch = checkpoint.get('epoch')
+    
+    def save_training_progress(G, D, g_optimizer, d_optimizer, epoch, target_dir):
+        torch.save({
+            'epoch' : epoch + 1,
+            'G_state_dict' : G.state_dict(),
+            'D_state_dict' : D.state_dict(),
+            'g_optim_state_dict' : g_optimizer.state_dict(),
+            'd_optim_state_dict' : d_optimizer.state_dict()
+        }, target_dir)
