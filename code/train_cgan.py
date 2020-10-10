@@ -11,6 +11,9 @@ import os
 # Hyperparameters
 BATCH_SIZE = 128
 Z_DIM = 100
+GENERATOR_LR = 0.0002
+DISCRIMINATOR_LR = 0.0002
+BETAS = (0.5, 0.999)
 
 if __name__ == "__main__":
     
@@ -137,3 +140,7 @@ Critic D:
             reduction_func = torch.sum
     
         return reduction_func(gradient_penalty)
+    
+    # 4. define the optimisers
+    g_optim = optim.Adam(G.parameters(), lr=GENERATOR_LR, betas=BETAS)
+    d_optim = optim.Adam(D.parameters(), lr=DISCRIMINATOR_LR, betas=BETAS)
