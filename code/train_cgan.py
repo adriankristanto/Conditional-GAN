@@ -106,3 +106,7 @@ Critic D:
     # move the models to the device that we use for training
     G.to(device)
     D.to(device)
+
+    # 3. define the loss function
+    def GradientPenaltyLoss(D, real_samples, fake_samples, reduction='mean'):
+        pass
