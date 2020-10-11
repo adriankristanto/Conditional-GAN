@@ -237,5 +237,20 @@ Critic D:
             g_optim.zero_grad()
             # 2. generate noise vectors
             noise = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
+            # 3. concatenate the noise vectors with the one-hot vectors
+            noise = torch.cat([noise, one_hot_labels], dim=1)
+            # 4. pass the noise vectors to the generator
+            fakes = G(noise)
+            # 5. concatenate the fakes with one-hot images
+            fakes = torch.cat([fakes, one_hot_images], dim=1)
+            # 6. predict the fakes
+            fakes_preds = D(fakes)
+            # 7. compute the loss
+            # we want to maximise the prediction of the critic on the fake samples
+            generator_loss = -1 * fakes_preds.mean()
+            # 8. backward propagation
+            generator_loss.backward()
+            # 9. optimiser update step
+            g_optim.step()
             break 
         break
