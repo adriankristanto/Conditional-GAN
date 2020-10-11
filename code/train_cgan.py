@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     trainset = datasets.MNIST(root=DATA_PATH, download=True, transform=train_transform)
 
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
 
     # total unique classes in MNIST dataset
     num_classes = len(trainset.classes)
