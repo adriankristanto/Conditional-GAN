@@ -210,23 +210,32 @@ Critic D:
                 # 3. concate the noise vectors with the one-hot vectors
                 # do not concatenate on the batch size dimension
                 noise = torch.cat([noise, one_hot_labels], dim=1)
-                # 3. pass the noise vectors to the generator
+                # 4. pass the noise vectors to the generator
                 fakes = G(noise)
-                # 4. predict the fakes
+                # 5. concatenate the fakes with the one-hot images
+                fakes = torch.cat([fakes, one_hot_images], dim=1)
+                # 6. predict the fakes
                 fakes_preds = D(fakes.detach())
-                # 5. predict the reals
+                # 7. concatenate the reals with the one-hot images
+                reals = torch.cat([reals, one_hot_images], dim=1)
+                # 8. predict the reals
                 reals_preds = D(reals)
-                # 6. compute the loss
+                # 9. compute the loss
                 # the higher the score of fake predictions, the higher the loss -> because we want to predict as low as possible for fakes
                 # the higher the score of real predictions, the lower the loss -> we want to predict as high as possible for fakes
                 discriminator_loss = fakes_preds.mean() - reals_preds.mean() + LAMBDA * GradientPenaltyLoss(D, reals, fakes)
-                # 7. backward propagation
+                # 10. backward propagation
                 discriminator_loss.backward()
-                # 8. optimiser update
+                # 11. optimiser update
                 d_optim.step()
 
-                discriminator_loss_mean = discriminator_loss / CRITIC_ITER
+                discriminator_loss_mean += discriminator_loss
+            discriminator_loss_mean = discriminator_loss_mean / CRITIC_ITER
 
             ### train generator
+            # 1. zeros the gradients
+            g_optim.zero_grad()
+            # 2. generate noise vectors
+            noise = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
             break 
         break
