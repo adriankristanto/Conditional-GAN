@@ -191,6 +191,7 @@ Critic D:
             G.train()
 
             reals, labels = train_data[0].to(device), train_data[1].to(device)
+            batch_size = len(reals)
             # convert the labels to one-hot vectors to be concatenated to the noise vector
             one_hot_labels = F.one_hot(labels, num_classes=num_classes)
             # expand the one-hot vectors to one-hot images of size (1, 28, 28)
@@ -202,6 +203,22 @@ Critic D:
             for _ in range(CRITIC_ITER):
                 # 1. zeros the gradients
                 d_optim.zero_grad()
+                # 2. generate noise vectors
+                noise = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
+                # 3. pass the noise vectors to the generator
+                fakes = G(noise)
+                # 4. predict the fakes
+                fakes_preds = D(fakes.detach())
+                # 5. predict the reals
+                reals_preds = D(reals)
+                # 6. compute the loss
+                # the higher the score of fake predictions, the higher the loss -> because we want to predict as low as possible for fakes
+                # the higher the score of real predictions, the lower the loss -> we want to predict as high as possible for fakes
+                discriminator_loss = fakes_preds.mean() - reals_preds.mean() + LAMBDA * GradientPenaltyLoss(D, reals, fakes)
+                # 7. backward propagation
+                discriminator_loss.backward()
+                # 8. optimiser update
+                d_optim.step()
 
             ### train generator
             break 
