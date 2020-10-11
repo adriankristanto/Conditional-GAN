@@ -199,6 +199,8 @@ Critic D:
             # next, repeat (1, 1, 28, 28)
             one_hot_images = one_hot_labels[:, :, None, None].repeat((1, *MNIST_IMG_SHAPE))
 
+            discriminator_loss_mean = 0
+
             ### train critic
             for _ in range(CRITIC_ITER):
                 # 1. zeros the gradients
@@ -219,6 +221,8 @@ Critic D:
                 discriminator_loss.backward()
                 # 8. optimiser update
                 d_optim.step()
+
+                discriminator_loss_mean = discriminator_loss / CRITIC_ITER
 
             ### train generator
             break 
