@@ -207,6 +207,9 @@ Critic D:
                 d_optim.zero_grad()
                 # 2. generate noise vectors
                 noise = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
+                # 3. concate the noise vectors with the one-hot vectors
+                # do not concatenate on the batch size dimension
+                noise = torch.cat([noise, one_hot_labels], dim=1)
                 # 3. pass the noise vectors to the generator
                 fakes = G(noise)
                 # 4. predict the fakes
