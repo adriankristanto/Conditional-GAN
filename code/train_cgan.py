@@ -262,7 +262,8 @@ Critic D:
             ))
 
             if i % SAMPLE_INTERVAL == 0:
-                torchvision.utils.save_image(fakes[:SAMPLE_SIZE], GENERATED_DIRPATH + f"cgan_{epoch+1}_{i}_{labels[:SAMPLE_SIZE]}.png")
+                print(labels[:SAMPLE_SIZE])
+                torchvision.utils.save_image(fakes[:SAMPLE_SIZE], GENERATED_DIRPATH + f"cgan_{epoch+1}_{i}.png")
         
         # save the model
         if (epoch + 1) % SAVE_INTERVAL == 0:
