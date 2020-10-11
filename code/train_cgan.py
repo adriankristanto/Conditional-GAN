@@ -193,11 +193,11 @@ Critic D:
             reals, labels = train_data[0].to(device), train_data[1].to(device)
             batch_size = len(reals)
             # convert the labels to one-hot vectors to be concatenated to the noise vector
-            one_hot_labels = F.one_hot(labels, num_classes=num_classes)
-            # expand the one-hot vectors to one-hot images of size (1, 28, 28)
             # first, expand the one-hot vectors to shape (batch_size, 10, 1, 1) using [:, :, None, None]
+            one_hot_labels = F.one_hot(labels, num_classes=num_classes)[:, :, None, None]
+            # expand the one-hot vectors to one-hot images of size (1, 28, 28)
             # next, repeat (1, 1, 28, 28)
-            one_hot_images = one_hot_labels[:, :, None, None].repeat((1, *MNIST_IMG_SHAPE))
+            one_hot_images = one_hot_labels.repeat((1, *MNIST_IMG_SHAPE))
 
             discriminator_loss_mean = 0
 
@@ -206,20 +206,21 @@ Critic D:
                 # 1. zeros the gradients
                 d_optim.zero_grad()
                 # 2. generate noise vectors
-                noise = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
+                noise_1 = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
                 # 3. concate the noise vectors with the one-hot vectors
                 # do not concatenate on the batch size dimension
-                noise = torch.cat([noise, one_hot_labels], dim=1)
+                # NOTE: one_hot_labels is not float, we need to turn it to float
+                noise_1_onehot = torch.cat([noise_1.float(), one_hot_labels.float()], dim=1)
                 # 4. pass the noise vectors to the generator
-                fakes = G(noise)
+                fakes = G(noise_1_onehot).detach()
                 # 5. concatenate the fakes with the one-hot images
-                fakes = torch.cat([fakes, one_hot_images], dim=1)
+                fakes_onehot = torch.cat([fakes.float(), one_hot_images.float()], dim=1)
                 # 6. predict the fakes
-                fakes_preds = D(fakes.detach())
+                fakes_preds = D(fakes_onehot)
                 # 7. concatenate the reals with the one-hot images
-                reals = torch.cat([reals, one_hot_images], dim=1)
+                reals_onehot = torch.cat([reals.float(), one_hot_images.float()], dim=1)
                 # 8. predict the reals
-                reals_preds = D(reals)
+                reals_preds = D(reals_onehot)
                 # 9. compute the loss
                 # the higher the score of fake predictions, the higher the loss -> because we want to predict as low as possible for fakes
                 # the higher the score of real predictions, the lower the loss -> we want to predict as high as possible for fakes
@@ -236,15 +237,15 @@ Critic D:
             # 1. zeros the gradients
             g_optim.zero_grad()
             # 2. generate noise vectors
-            noise = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
+            noise_2 = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
             # 3. concatenate the noise vectors with the one-hot vectors
-            noise = torch.cat([noise, one_hot_labels], dim=1)
+            noise_2_onehot = torch.cat([noise_2, one_hot_labels], dim=1)
             # 4. pass the noise vectors to the generator
-            fakes = G(noise)
+            fakes = G(noise_2_onehot)
             # 5. concatenate the fakes with one-hot images
-            fakes = torch.cat([fakes, one_hot_images], dim=1)
+            fakes_onehot = torch.cat([fakes, one_hot_images], dim=1)
             # 6. predict the fakes
-            fakes_preds = D(fakes)
+            fakes_preds = D(fakes_onehot)
             # 7. compute the loss
             # we want to maximise the prediction of the critic on the fake samples
             generator_loss = -1 * fakes_preds.mean()
