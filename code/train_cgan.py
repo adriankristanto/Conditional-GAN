@@ -15,7 +15,8 @@ CONTINUE_TRAIN_NAME = 'cgan-model-epoch10.pth'
 EPOCH = 400
 SAVE_INTERVAL = 20
 # for generation
-SAMPLE_SIZE = 64
+SAMPLE_INTERVAL = 100
+SAMPLE_SIZE = 32
 
 # Hyperparameters
 BATCH_SIZE = 128
@@ -51,7 +52,7 @@ if __name__ == "__main__":
         os.mkdir(MAIN_DIR + 'saved_models')
     
     # 1. load the dataset
-    DATA_PATH = MAIN_DIR + 'data'
+    DATA_PATH = MAIN_DIR + 'data/'
     train_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.5,), (0.5))
@@ -160,8 +161,8 @@ Critic D:
     d_optim = optim.Adam(D.parameters(), lr=DISCRIMINATOR_LR, betas=BETAS)
 
     # 5. train the model
-    MODEL_DIRPATH = MAIN_DIR + 'saved_models'
-    GENERATED_DIRPATH = MAIN_DIR + 'generated_images'
+    MODEL_DIRPATH = MAIN_DIR + 'saved_models/'
+    GENERATED_DIRPATH = MAIN_DIR + 'generated_images/'
     SAVED_MODEL_NAME = MODEL_DIRPATH + CONTINUE_TRAIN_NAME
 
     next_epoch = 0
@@ -253,5 +254,19 @@ Critic D:
             generator_loss.backward()
             # 9. optimiser update step
             g_optim.step()
-            break 
-        break
+
+            trainloader.set_description((
+                f"epoch: {epoch+1}/{EPOCH}; "
+                f"generator loss: {generator_loss.item():.5f}; "
+                f"critic loss: {discriminator_loss_mean.item():.5f}"
+            ))
+
+            if i % SAMPLE_INTERVAL == 0:
+                torchvision.utils.save_image(fakes[:SAMPLE_SIZE], GENERATED_DIRPATH + f"cgan_{epoch+1}_{i}_{labels[:SAMPLE_SIZE]}.png")
+        
+        # save the model
+        if (epoch + 1) % SAVE_INTERVAL == 0:
+            save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'cgan-model-epoch{epoch + 1}.pth')
+    
+    # save the model at the end of training
+    save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'cgan-model-epoch{epoch + 1}.pth')
