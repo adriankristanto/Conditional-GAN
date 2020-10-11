@@ -224,7 +224,7 @@ Critic D:
                 # 9. compute the loss
                 # the higher the score of fake predictions, the higher the loss -> because we want to predict as low as possible for fakes
                 # the higher the score of real predictions, the lower the loss -> we want to predict as high as possible for fakes
-                discriminator_loss = fakes_preds.mean() - reals_preds.mean() + LAMBDA * GradientPenaltyLoss(D, reals, fakes)
+                discriminator_loss = fakes_preds.mean() - reals_preds.mean() + LAMBDA * GradientPenaltyLoss(D, reals_onehot, fakes_onehot)
                 # 10. backward propagation
                 discriminator_loss.backward()
                 # 11. optimiser update
@@ -239,11 +239,11 @@ Critic D:
             # 2. generate noise vectors
             noise_2 = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
             # 3. concatenate the noise vectors with the one-hot vectors
-            noise_2_onehot = torch.cat([noise_2, one_hot_labels], dim=1)
+            noise_2_onehot = torch.cat([noise_2.float(), one_hot_labels.float()], dim=1)
             # 4. pass the noise vectors to the generator
             fakes = G(noise_2_onehot)
             # 5. concatenate the fakes with one-hot images
-            fakes_onehot = torch.cat([fakes, one_hot_images], dim=1)
+            fakes_onehot = torch.cat([fakes.float(), one_hot_images.float()], dim=1)
             # 6. predict the fakes
             fakes_preds = D(fakes_onehot)
             # 7. compute the loss
