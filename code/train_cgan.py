@@ -17,6 +17,8 @@ SAVE_INTERVAL = 20
 # for generation
 SAMPLE_INTERVAL = 100
 SAMPLE_SIZE = 32
+# shape of a single image
+INPUT_IMG_SHAPE = (1, 28, 28)
 
 # Hyperparameters
 BATCH_SIZE = 128
@@ -64,8 +66,6 @@ if __name__ == "__main__":
 
     # total unique classes in MNIST dataset
     num_classes = len(trainset.classes)
-    # shape of a single MNIST image
-    MNIST_IMG_SHAPE = (1, 28, 28)
 
     print(f"""
 Total training data: {len(trainset)}
@@ -92,7 +92,7 @@ Total unique classes: {num_classes}
     )
 
     # Discriminator D
-    INPUT_CHANNEL = MNIST_IMG_SHAPE[0] + num_classes
+    INPUT_CHANNEL = INPUT_IMG_SHAPE[0] + num_classes
     # we will append (batch_size, num_classes, 28, 28), which is similar to the one-hot vector
     # to (batch_size, 1, 28, 28) which is the input batch of MNIST
     # for example, if dimension 3 of the one-hot vector has the value 1, then we create a tensor of size (1, 28, 28) full on 1s for index 3
@@ -198,7 +198,7 @@ Critic D:
             one_hot_labels = F.one_hot(labels, num_classes=num_classes)[:, :, None, None]
             # expand the one-hot vectors to one-hot images of size (1, 28, 28)
             # next, repeat (1, 1, 28, 28)
-            one_hot_images = one_hot_labels.repeat((1, *MNIST_IMG_SHAPE))
+            one_hot_images = one_hot_labels.repeat((1, *INPUT_IMG_SHAPE))
 
             discriminator_loss_mean = 0
 
