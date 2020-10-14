@@ -40,6 +40,8 @@ def CriticLoss(fakes_preds, reals_preds, reduction='mean'):
     elif reduction == 'sum':
         reduction_func = torch.sum
 
+    # the higher the score of fake predictions, the higher the loss -> because we want to predict as low as possible for fakes
+    # the higher the score of real predictions, the lower the loss -> we want to predict as high as possible for fakes
     return reduction_func(fakes_preds) - reduction_func(reals_preds)
 
 # the implementation of the generator loss
@@ -49,5 +51,6 @@ def GeneratorLoss(fakes_preds, reduction='mean'):
         reduction_func = torch.mean
     elif reduction == 'sum':
         reduction_func = torch.sum
-
+        
+    # # we want to maximise the prediction of the critic on the fake samples
     return -1 * reduction_func(fakes_preds)
