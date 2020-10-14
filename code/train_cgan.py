@@ -13,7 +13,7 @@ from utils import CriticLoss, GradientPenaltyLoss, GeneratorLoss
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 CONTINUE_TRAIN = False
 CONTINUE_TRAIN_NAME = 'cgan-model-epoch10.pth'
-EPOCH = 400
+EPOCH = 200
 SAVE_INTERVAL = 20
 # for generation
 SAMPLE_INTERVAL = 100
