@@ -8,6 +8,7 @@ import torchvision.transforms as transforms
 from tqdm import tqdm
 import models.DCGAN as DCGAN
 import os
+from utils import CriticLoss, GradientPenaltyLoss, GeneratorLoss
 
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 CONTINUE_TRAIN = False
@@ -124,37 +125,6 @@ Critic D:
     # move the models to the device that we use for training
     G.to(device)
     D.to(device)
-
-    # 3. define the loss function
-    def GradientPenaltyLoss(D, real_samples, fake_samples, reduction='mean'):
-        batch_size = len(real_samples)
-        epsilon = torch.rand((batch_size, 1, 1, 1)).to(device)
-
-        inputs = epsilon * real_samples + (1 - epsilon) * fake_samples
-        inputs.requires_grad_(True)
-        inputs = inputs.to(device)
-
-        outputs = D(inputs)
-
-        gradients = torch.autograd.grad(
-            inputs=inputs,
-            outputs=outputs,
-            grad_outputs=torch.ones_like(outputs).to(device),
-            create_graph=True,
-            retain_graph=True
-        )[0]
-
-        gradients = gradients.view(batch_size, -1)
-        
-        gradient_penalty = (gradients.norm(2, dim=1) - 1) ** 2
-
-        reduction_func = None
-        if reduction == 'mean':
-            reduction_func = torch.mean
-        elif reduction == 'sum':
-            reduction_func = torch.sum
-    
-        return reduction_func(gradient_penalty)
     
     # 4. define the optimisers
     g_optim = optim.Adam(G.parameters(), lr=GENERATOR_LR, betas=BETAS)
@@ -225,7 +195,7 @@ Critic D:
                 # 9. compute the loss
                 # the higher the score of fake predictions, the higher the loss -> because we want to predict as low as possible for fakes
                 # the higher the score of real predictions, the lower the loss -> we want to predict as high as possible for fakes
-                discriminator_loss = fakes_preds.mean() - reals_preds.mean() + LAMBDA * GradientPenaltyLoss(D, reals_onehot, fakes_onehot)
+                discriminator_loss = CriticLoss(fakes_preds, reals_preds) + LAMBDA * GradientPenaltyLoss(D, reals_onehot, fakes_onehot, device=device)
                 # 10. backward propagation
                 discriminator_loss.backward()
                 # 11. optimiser update
@@ -249,7 +219,7 @@ Critic D:
             fakes_preds = D(fakes_onehot)
             # 7. compute the loss
             # we want to maximise the prediction of the critic on the fake samples
-            generator_loss = -1 * fakes_preds.mean()
+            generator_loss = GeneratorLoss(fakes_preds)
             # 8. backward propagation
             generator_loss.backward()
             # 9. optimiser update step
