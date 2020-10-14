@@ -214,7 +214,7 @@ Critic D:
                 torchvision.utils.save_image(fakes[:SAMPLE_SIZE], GENERATED_DIRPATH + f"unconditionalgan_{epoch+1}_{i}.png")
         
         # save the model
-        if (epoch + 1) % SAVE_INTERNAL == 0:
+        if (epoch + 1) % SAVE_INTERVAL == 0:
             save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'unconditionalgan-model-epoch{epoch+1}.pth')
     
     # save the model at the end of training
