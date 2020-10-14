@@ -113,3 +113,15 @@ Generator G:
 Critic D:
 {D}
 """, flush=True)
+
+    # setting for training using multiple GPUs
+    multigpu = False
+    if torch.cuda.device_count() > 1:
+        print(f'Number of GPUs: {torch.cuda.device_count()}\n', flush=True)
+        G = nn.DataParallel(G)
+        D = nn.DataParallel(D)
+        multigpu = True
+    
+    # move the models to the device that we use for training
+    G.to(device)
+    D.to(device)
