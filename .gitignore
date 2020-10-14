@@ -9,4 +9,5 @@ generated_images/
 reconstructed_images/
 logs/
 
-run.sh
+cgan_run.sh
+unconditionalgan_run.sh
