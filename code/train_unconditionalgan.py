@@ -125,3 +125,7 @@ Critic D:
     # move the models to the device that we use for training
     G.to(device)
     D.to(device)
+
+    # 3. define the optimisers
+    g_optim = optim.Adam(G.parameters(), lr=GENERATOR_LR, betas=BETAS)
+    d_optim = optim.Adam(D.parameters(), lr=DISCRIMINATOR_LR, betas=BETAS)
