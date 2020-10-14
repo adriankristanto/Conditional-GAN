@@ -129,3 +129,93 @@ Critic D:
     # 3. define the optimisers
     g_optim = optim.Adam(G.parameters(), lr=GENERATOR_LR, betas=BETAS)
     d_optim = optim.Adam(D.parameters(), lr=DISCRIMINATOR_LR, betas=BETAS)
+
+    # 4. train the model
+    MODEL_DIRPATH = MAIN_DIR + 'saved_models/'
+    GENERATED_DIRPATH = MAIN_DIR + 'generated_images/'
+    SAVED_MODEL_NAME = MODEL_DIRPATH + CONTINUE_TRAIN_NAME
+
+    next_epoch = 0
+    if CONTINUE_TRAIN:
+        checkpoint = torch.load(SAVED_MODEL_NAME)
+        G.load_state_dict(checkpoint.get('G_state_dict'))
+        D.load_state_dict(checkpoint.get('D_state_dict'))
+        g_optim.load_state_dict(checkpoint.get('g_optim_state_dict'))
+        d_optim.load_state_dict(checkpoint.get('d_optim_state_dict'))
+        next_epoch = checkpoint.get('epoch')
+    
+    def save_training_progress(G, D, g_optimizer, d_optimizer, epoch, target_dir):
+        torch.save({
+            'epoch' : epoch + 1,
+            'G_state_dict' : G.state_dict(),
+            'D_state_dict' : D.state_dict(),
+            'g_optim_state_dict' : g_optimizer.state_dict(),
+            'd_optim_state_dict' : d_optimizer.state_dict()
+        }, target_dir)
+
+    for epoch in range(next_epoch, EPOCH):
+
+        trainloader = tqdm(trainloader)
+
+        for i, train_data in enumerate(trainloader):
+            D.train()
+            G.train()
+
+            reals = train_data[0].to(device)
+            batch_size = len(reals)
+
+            discriminator_loss_mean = 0
+
+            ### train critic
+            for _ in range(CRITIC_ITER):
+                # 1. zeros the gradients
+                d_optim.zero_grad()
+                # 2. generate noise vectors
+                noise_1 = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
+                # 3. pass the noise vectors to the generator
+                fakes = G(noise_1).detach()
+                # 4. predict fakes
+                fakes_preds = D(fakes)
+                # 5. predict reals
+                reals_preds = D(reals)
+                # 6. compute the loss
+                discriminator_loss = CriticLoss(fakes_preds, reals_preds) + LAMBDA * GradientPenaltyLoss(D, reals, fakes, device=device)
+                # 7. backward propagation
+                discriminator_loss.backward()
+                # 8. optimiser update
+                d_optim.step()
+
+                discriminator_loss_mean += discriminator_loss
+            discriminator_loss_mean = discriminator_loss_mean / CRITIC_ITER
+
+            ### train generator
+            # 1. zeros the gradients
+            g_optim.zero_grad()
+            # 2. generate noise vectors
+            noise_2 = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
+            # 3. pass the noise vectors to the generator
+            fakes = G(noise_2)
+            # 4. predict the fakes 
+            fakes_preds = D(fakes)
+            # 5. compute the loss
+            generator_loss = GeneratorLoss(fakes_preds)
+            # 6. backward propagation
+            generator_loss.backward()
+            # 7. optimiser update
+            g_optim.step()
+
+            trainloader.set_description((
+                f"epoch: {epoch+1}/{EPOCH}; "
+                f"generator loss: {generator_loss.item():.5f}; "
+                f"critic loss: {discriminator_loss_mean.item():.5f}"
+            ))
+
+            if i % SAMPLE_INTERVAL == 0:
+                torchvision.utils.save_image(fakes[:SAMPLE_SIZE], GENERATED_DIRPATH + f"unconditionalgan_{epoch+1}_{i}.png")
+        
+        # save the model
+        if (epoch + 1) % SAVE_INTERNAL == 0:
+            save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'unconditionalgan-model-epoch{epoch+1}.pth')
+    
+    # save the model at the end of training
+    save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'unconditionalgan-model-epoch{epoch+1}.pth')
