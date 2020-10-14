@@ -53,3 +53,22 @@ if __name__ == "__main__":
     if 'saved_models' not in os.listdir(MAIN_DIR):
         print('creating saved_models directory...', flush=True)
         os.mkdir(MAIN_DIR + 'saved_models')
+    
+    # 1. load the dataset
+    DATA_PATH = MAIN_DIR + 'data/'
+    train_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.5,), (0.5))
+    ])
+
+    trainset = datasets.MNIST(root=DATA_PATH, download=True, transform=train_transform)
+
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
+
+    # total unique classes in MNIST dataset
+    num_classes = len(trainset.classes)
+
+    print(f"""
+Total training data: {len(trainset)}
+Total unique classes: {num_classes}
+    """, flush=True)
