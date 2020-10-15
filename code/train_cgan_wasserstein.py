@@ -16,7 +16,7 @@ CONTINUE_TRAIN_NAME = 'cgan-model-epoch10.pth'
 EPOCH = 200
 SAVE_INTERVAL = 20
 # for generation
-SAMPLE_INTERVAL = 100
+SAMPLE_INTERVAL = 469
 SAMPLE_SIZE = 32
 # shape of a single image
 INPUT_IMG_SHAPE = (1, 28, 28)
