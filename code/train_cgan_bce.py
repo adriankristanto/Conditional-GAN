@@ -125,3 +125,26 @@ Critic D:
     # 4. define the optimisers
     g_optim = optim.Adam(G.parameters(), lr=GENERATOR_LR, betas=BETAS)
     d_optim = optim.Adam(D.parameters(), lr=DISCRIMINATOR_LR, betas=BETAS)
+
+    # 5. train the model
+    MODEL_DIRPATH = MAIN_DIR + 'saved_models/'
+    GENERATED_DIRPATH = MAIN_DIR + 'generated_images/'
+    SAVED_MODEL_NAME = MODEL_DIRPATH + CONTINUE_TRAIN_NAME
+
+    next_epoch = 0
+    if CONTINUE_TRAIN:
+        checkpoint = torch.load(SAVED_MODEL_NAME)
+        G.load_state_dict(checkpoint.get('G_state_dict'))
+        D.load_state_dict(checkpoint.get('D_state_dict'))
+        g_optim.load_state_dict(checkpoint.get('g_optim_state_dict'))
+        d_optim.load_state_dict(checkpoint.get('d_optim_state_dict'))
+        next_epoch = checkpoint.get('epoch')
+    
+    def save_training_progress(G, D, g_optimizer, d_optimizer, epoch, target_dir):
+        torch.save({
+            'epoch' : epoch + 1,
+            'G_state_dict' : G.state_dict(),
+            'D_state_dict' : D.state_dict(),
+            'g_optim_state_dict' : g_optimizer.state_dict(),
+            'd_optim_state_dict' : d_optimizer.state_dict()
+        }, target_dir)
