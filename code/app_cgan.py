@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torchvision
 from datetime import datetime
 import models.DCGAN as DCGAN
@@ -10,6 +11,8 @@ from collections import OrderedDict
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 MODEL_DIR = MAIN_DIR + 'saved_models/'
 FILE_PATH = MODEL_DIR + 'cgan-model-epoch100.pth'
+
+SAMPLE_SIZE = 2
 
 Z_DIM = 100
 num_classes = 10
@@ -42,3 +45,27 @@ if 'module.' in list(old_G_state_dict.keys())[0]:
     G.load_state_dict(new_G_state_dict)
 else:
     G.load_state_dict(old_G_state_dict)
+
+# accepts user input
+# reference: https://stackoverflow.com/questions/56513576/converting-tensor-to-one-hot-encoded-tensor-of-indices/56523313
+# to convert a tensor to an index tensor, use .long() to convert it to int64
+digit = torch.Tensor(
+    [int(input("Choose a digit (0-9): "))]
+    ).long().to(device)
+
+# encode the index tensor from the user input
+# repeat it SAMPLE_SIZE times for the batch dimension to make it to shape (SAMPLE_SIZE, num_classes)
+# finally, expand the dim to have 4 dimensions with [:, :, None, None]
+one_hot_digit = F.one_hot(digit, num_classes=num_classes).repeat((SAMPLE_SIZE, 1))[:, :, None, None]
+
+# create a noise vector
+noise = torch.randn((SAMPLE_SIZE, Z_DIM, 1, 1)).to(device)
+
+# concatenate the noise with the one hot vector
+noise_onehot = torch.cat([noise.float(), one_hot_digit.float()], dim=1)
+
+# generate a new image
+images = G(noise_onehot)
+
+# save the generated images
+torchvision.utils.save_image(images, datetime.now().strftime('%d_%m_%Y_%H%M%S') + '.png')
