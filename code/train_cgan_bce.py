@@ -187,8 +187,33 @@ Critic D:
             # 9. compute the loss
             discriminator_loss = (criterion(fakes_preds, torch.zeros_like(fakes_preds)) + criterion(reals_preds, torch.ones_like(reals_preds))) / 2
             # 10. backward propagation
-            discriminator_loss.backward()
+            discriminator_loss.backward(retain_graph=True)
             # 11. optimiser update
             d_optim.step()
 
-            discriminator_loss_mean += discriminator_loss
+            ### train generator
+            # 1. zeros the gradients
+            g_optim.zero_grad()
+            # 2. generate noise vectors
+            noise_2 = torch.randn((batch_size, Z_DIM, 1, 1)).to(device)
+            # 3. concatenate the noise vectors with the one-hot vectors
+            noise_2_onehot = torch.cat([noise_2.float(), one_hot_labels.float()], dim=1)
+            # 4. pass the noise vectors to the generator
+            fakes = G(noise_2_onehot)
+            # 5. concatenate the fakes with one-hot images
+            fakes_onehot = torch.cat([fakes.float(), one_hot_images.float()], dim=1)
+            # 6. predict the fakes
+            fakes_preds = D(fakes_onehot)
+            # 7. compute the loss
+            # we want to maximise the prediction of the critic on the fake samples
+            generator_loss = criterion(fakes_preds, torch.ones_like(fakes_preds))
+            # 8. backward propagation
+            generator_loss.backward()
+            # 9. optimiser update step
+            g_optim.step()
+
+            trainloader.set_description((
+                f"epoch: {epoch+1}/{EPOCH}; "
+                f"generator loss: {generator_loss.item():.5f}; "
+                f"critic loss: {discriminator_loss.item():.5f}"
+            ))
