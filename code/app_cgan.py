@@ -12,7 +12,7 @@ MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 MODEL_DIR = MAIN_DIR + 'saved_models/'
 FILE_PATH = MODEL_DIR + 'cgan-model-epoch100.pth'
 
-SAMPLE_SIZE = 2
+SAMPLE_SIZE = 256
 
 Z_DIM = 100
 num_classes = 10
