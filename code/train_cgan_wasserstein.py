@@ -12,7 +12,7 @@ from utils import CriticLoss, GradientPenaltyLoss, GeneratorLoss
 
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 CONTINUE_TRAIN = False
-CONTINUE_TRAIN_NAME = 'cgan-model-epoch10.pth'
+CONTINUE_TRAIN_NAME = 'cgan-model-wasserstein-epoch10.pth'
 EPOCH = 200
 SAVE_INTERVAL = 20
 # for generation
@@ -233,11 +233,11 @@ Critic D:
 
             if i % SAMPLE_INTERVAL == 0:
                 print(labels[:SAMPLE_SIZE])
-                torchvision.utils.save_image(fakes[:SAMPLE_SIZE], GENERATED_DIRPATH + f"cgan_{epoch+1}_{i}.png")
+                torchvision.utils.save_image(fakes[:SAMPLE_SIZE], GENERATED_DIRPATH + f"cgan_wasserstein_{epoch+1}_{i}.png")
         
         # save the model
         if (epoch + 1) % SAVE_INTERVAL == 0:
-            save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'cgan-model-epoch{epoch + 1}.pth')
+            save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'cgan-model-wasserstein-epoch{epoch + 1}.pth')
     
     # save the model at the end of training
-    save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'cgan-model-epoch{epoch + 1}.pth')
+    save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'cgan-model-wasserstein-epoch{epoch + 1}.pth')
