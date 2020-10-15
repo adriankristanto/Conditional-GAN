@@ -217,3 +217,14 @@ Critic D:
                 f"generator loss: {generator_loss.item():.5f}; "
                 f"critic loss: {discriminator_loss.item():.5f}"
             ))
+
+            if i % SAMPLE_INTERVAL == 0:
+                print(labels[:SAMPLE_SIZE])
+                torchvision.utils.save_image(fakes[:SAMPLE_SIZE], GENERATED_DIRPATH + f"cgan_bce_{epoch+1}_{i}.png")
+        
+        # save the model
+        if (epoch + 1) % SAVE_INTERVAL == 0:
+            save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'cgan-model-bce-epoch{epoch + 1}.pth')
+    
+    # save the model at the end of training
+    save_training_progress(G, D, g_optim, d_optim, epoch, MODEL_DIRPATH + f'cgan-model-bce-epoch{epoch + 1}.pth')
