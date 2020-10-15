@@ -4,7 +4,6 @@
 __pycache__/
 
 data/
-saved_models/
 generated_images/
 reconstructed_images/
 logs/
