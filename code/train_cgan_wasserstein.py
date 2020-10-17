@@ -17,7 +17,7 @@ EPOCH = 200
 SAVE_INTERVAL = 20
 # for generation
 SAMPLE_INTERVAL = 469
-SAMPLE_SIZE = 32
+SAMPLE_SIZE = 64
 # shape of a single image
 INPUT_IMG_SHAPE = (1, 32, 32)
 
