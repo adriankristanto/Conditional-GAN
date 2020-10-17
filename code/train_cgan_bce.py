@@ -52,7 +52,7 @@ if __name__ == "__main__":
     train_transform = transforms.Compose([
         transforms.Resize((32, 32)),
         transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
+        transforms.Normalize((0.5,), (0.5,))
     ])
 
     trainset = datasets.MNIST(root=DATA_PATH, download=True, transform=train_transform)
