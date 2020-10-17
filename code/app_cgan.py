@@ -10,7 +10,7 @@ from collections import OrderedDict
 # path to the pth file
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 MODEL_DIR = MAIN_DIR + 'saved_models/'
-FILE_PATH = MODEL_DIR + 'cgan-model-wasserstein-epoch100.pth'
+FILE_PATH = MODEL_DIR + 'cgan-model-bce-epoch200_32x32.pth'
 
 SAMPLE_SIZE = 256
 
@@ -23,10 +23,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # load the model
 G = DCGAN.Generator(
-    channels=[INPUT_DIM, 256, 128, 64, 1],
-    kernel_sizes=[None, 7, 5, 4, 4],
-    strides=[None, 1, 1, 2, 2],
-    paddings=[None, 0, 2, 1, 1],
+    channels=[INPUT_DIM, 512, 256, 128, 1],
+    kernel_sizes=[None, 4, 4, 4, 4],
+    strides=[None, 1, 2, 2, 2],
+    paddings=[None, 0, 1, 1, 1],
     batch_norm=True,
     activations=[nn.ReLU(), nn.Tanh()]
 )
