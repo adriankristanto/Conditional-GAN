@@ -18,7 +18,7 @@ SAVE_INTERVAL = 20
 SAMPLE_INTERVAL = 469
 SAMPLE_SIZE = 64
 # shape of a single image
-INPUT_IMG_SHAPE = (1, 28, 28)
+INPUT_IMG_SHAPE = (1, 32, 32)
 
 # Hyperparameters
 BATCH_SIZE = 128
@@ -50,8 +50,9 @@ if __name__ == "__main__":
     # 1. load the dataset
     DATA_PATH = MAIN_DIR + 'data/'
     train_transform = transforms.Compose([
+        transforms.Resize((32, 32)),
         transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5))
+        transforms.Normalize((0.1307,), (0.3081,))
     ])
 
     trainset = datasets.MNIST(root=DATA_PATH, download=True, transform=train_transform)
@@ -78,9 +79,9 @@ Total unique classes: {num_classes}
     # where the one-hot vector is of num_classes dimension
     G = DCGAN.Generator(
         channels=[INPUT_DIM, 256, 128, 64, 1],
-        kernel_sizes=[None, 7, 5, 4, 4],
-        strides=[None, 1, 1, 2, 2],
-        paddings=[None, 0, 2, 1, 1],
+        kernel_sizes=[None, 4, 4, 4, 4],
+        strides=[None, 1, 2, 2, 2],
+        paddings=[None, 0, 1, 1, 1],
         batch_norm=True,
         activations=[nn.ReLU(), nn.Tanh()]
     )
@@ -93,9 +94,9 @@ Total unique classes: {num_classes}
     # and the other 9 tensor will be filled with 0s
     D = DCGAN.Discriminator(
         channels=[INPUT_CHANNEL, 64, 128, 256, 1],
-        kernel_sizes=[None, 4, 4, 5, 7],
-        strides=[None, 2, 2, 1, 1],
-        paddings=[None, 1, 1, 2, 0],
+        kernel_sizes=[None, 4, 4, 4, 4],
+        strides=[None, 2, 2, 2, 1],
+        paddings=[None, 1, 1, 1, 0],
         batch_norm=False,
         activation=nn.LeakyReLU(0.2),
     )
