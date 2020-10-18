@@ -85,7 +85,7 @@ Total unique classes: {num_classes}
     # we will append a one-hot vector to the z_dim
     # where the one-hot vector is of num_classes dimension
     G = DCGAN.Generator(
-        channels=[INPUT_DIM, 256, 128, 64, 1],
+        channels=[INPUT_DIM, 512, 256, 128, 1],
         kernel_sizes=[None, 4, 4, 4, 4],
         strides=[None, 1, 2, 2, 2],
         paddings=[None, 0, 1, 1, 1],
@@ -100,7 +100,7 @@ Total unique classes: {num_classes}
     # for example, if dimension 3 of the one-hot vector has the value 1, then we create a tensor of size (1, 28, 28) full on 1s for index 3
     # and the other 9 tensor will be filled with 0s
     D = DCGAN.Discriminator(
-        channels=[INPUT_CHANNEL, 64, 128, 256, 1],
+        channels=[INPUT_CHANNEL, 128, 256, 512, 1],
         kernel_sizes=[None, 4, 4, 4, 4],
         strides=[None, 2, 2, 2, 1],
         paddings=[None, 1, 1, 1, 0],
