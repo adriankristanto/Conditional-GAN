@@ -10,9 +10,9 @@ from collections import OrderedDict
 # path to the pth file
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 MODEL_DIR = MAIN_DIR + 'saved_models/'
-FILE_PATH = MODEL_DIR + 'cgan-model-bce-epoch200_32x32.pth'
+FILE_PATH = MODEL_DIR + 'cgan-model-bce-epoch180_32x32.pth'
 
-SAMPLE_SIZE = 256
+SAMPLE_SIZE = 1024
 
 Z_DIM = 100
 num_classes = 10
@@ -68,4 +68,4 @@ noise_onehot = torch.cat([noise.float(), one_hot_digit.float()], dim=1)
 images = G(noise_onehot)
 
 # save the generated images
-torchvision.utils.save_image(images, datetime.now().strftime('%d_%m_%Y_%H%M%S') + '.png')
+torchvision.utils.save_image(images, datetime.now().strftime('%d_%m_%Y_%H%M%S') + '.png', nrow=32)
