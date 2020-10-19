@@ -10,7 +10,7 @@ from collections import OrderedDict
 # path to the pth file
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 MODEL_DIR = MAIN_DIR + 'saved_models/'
-FILE_PATH = MODEL_DIR + 'cgan-model-bce-epoch180_32x32.pth'
+FILE_PATH = MODEL_DIR + 'cgan-model-wasserstein-epoch100_32x32.pth'
 
 SAMPLE_SIZE = 1024
 
