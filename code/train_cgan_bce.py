@@ -7,6 +7,7 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from tqdm import tqdm
 import models.DCGAN as DCGAN
+from gtsrb_dataset import GTSRB
 import os
 
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
@@ -25,7 +26,7 @@ GENERATOR_LR = 0.0002
 DISCRIMINATOR_LR = 0.0002
 BETAS = (0.5, 0.999)
 
-DATASET = "cifar10"
+DATASET = "gtsrb"
 
 if __name__ == "__main__":
     
@@ -74,6 +75,18 @@ if __name__ == "__main__":
         ])
 
         trainset = datasets.CIFAR10(root=DATA_PATH, train=True, transform=train_transform, download=True)
+    
+    elif DATASET == 'gtsrb':
+        # shape of a single image
+        INPUT_IMG_SHAPE = (3, 32, 32)
+
+        train_transform = transforms.Compose([
+            transforms.Resize((32, 32)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+
+        trainset = GTSRB(root_dir='./data', train=True,  transform=train_transform)
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
 
