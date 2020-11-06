@@ -18,8 +18,6 @@ SAVE_INTERVAL = 20
 # for generation
 SAMPLE_INTERVAL = 469
 SAMPLE_SIZE = 64
-# shape of a single image
-INPUT_IMG_SHAPE = (1, 32, 32)
 
 # Hyperparameters
 BATCH_SIZE = 128
@@ -33,6 +31,8 @@ BETAS = (0.5, 0.999)
 CRITIC_ITER = 5
 # the following is the penalty coefficient
 LAMBDA = 10
+
+DATASET = 'mnist'
 
 if __name__ == "__main__":
     
@@ -56,13 +56,31 @@ if __name__ == "__main__":
     
     # 1. load the dataset
     DATA_PATH = MAIN_DIR + 'data/'
-    train_transform = transforms.Compose([
-        transforms.Resize((32, 32)),
-        transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5,))
-    ])
 
-    trainset = datasets.MNIST(root=DATA_PATH, download=True, transform=train_transform)
+    INPUT_IMG_SHAPE = None
+
+    if DATASET == 'mnist':
+        # shape of a single image
+        INPUT_IMG_SHAPE = (1, 32, 32)
+
+        train_transform = transforms.Compose([
+            transforms.Resize((32, 32)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5,), (0.5,))
+        ])
+
+        trainset = datasets.MNIST(root=DATA_PATH, download=True, transform=train_transform)
+    
+    elif DATASET == 'cifar10':
+        # shape of a single image
+        INPUT_IMG_SHAPE = (3, 32, 32)
+
+        train_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+
+        trainset = datasets.CIFAR10(root=DATA_PATH, train=True, transform=train_transform, download=True)
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
 
