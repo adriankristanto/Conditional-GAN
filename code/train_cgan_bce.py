@@ -25,7 +25,7 @@ GENERATOR_LR = 0.0002
 DISCRIMINATOR_LR = 0.0002
 BETAS = (0.5, 0.999)
 
-DATASET = "mnist"
+DATASET = "cifar10"
 
 if __name__ == "__main__":
     
@@ -96,7 +96,7 @@ Total unique classes: {num_classes}
     # we will append a one-hot vector to the z_dim
     # where the one-hot vector is of num_classes dimension
     G = DCGAN.Generator(
-        channels=[INPUT_DIM, 512, 256, 128, 1],
+        channels=[INPUT_DIM, 512, 256, 128, INPUT_IMG_SHAPE[0]],
         kernel_sizes=[None, 4, 4, 4, 4],
         strides=[None, 1, 2, 2, 2],
         paddings=[None, 0, 1, 1, 1],
