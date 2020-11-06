@@ -183,7 +183,7 @@ Critic D:
             one_hot_labels = F.one_hot(labels, num_classes=num_classes)[:, :, None, None]
             # expand the one-hot vectors to one-hot images of size (1, 28, 28)
             # next, repeat (1, 1, 28, 28)
-            one_hot_images = one_hot_labels.repeat((1, *INPUT_IMG_SHAPE))
+            one_hot_images = one_hot_labels.repeat((1, 1, *INPUT_IMG_SHAPE[1:]))
 
             # 1. zeros the gradients
             d_optim.zero_grad()
