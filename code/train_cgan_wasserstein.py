@@ -32,7 +32,7 @@ CRITIC_ITER = 5
 # the following is the penalty coefficient
 LAMBDA = 10
 
-DATASET = 'mnist'
+DATASET = 'cifar10'
 
 if __name__ == "__main__":
     
