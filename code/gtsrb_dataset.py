@@ -28,7 +28,7 @@ class GTSRB(Dataset):
 
         self.csv_data = pd.read_csv(csv_file_path)
 
-        self.classes = 43
+        self.classes = [i for i in range(0, 43)]
 
         self.transform = transform
 
