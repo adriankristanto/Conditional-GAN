@@ -28,6 +28,8 @@ class GTSRB(Dataset):
 
         self.csv_data = pd.read_csv(csv_file_path)
 
+        self.classes = 43
+
         self.transform = transform
 
     def __len__(self):
