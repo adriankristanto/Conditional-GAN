@@ -13,7 +13,7 @@ import os
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 CONTINUE_TRAIN = False
 CONTINUE_TRAIN_NAME = 'cgan-model-bce-epoch20_32x32.pth'
-EPOCH = 1000
+EPOCH = 500
 SAVE_INTERVAL = 50
 # for generation
 SAMPLE_INTERVAL = 200
